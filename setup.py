@@ -6,13 +6,14 @@ from numpy.distutils.core import setup, Extension
 import os
 
 
-blas_build = 'internal'
+blas_build = 'internal'  # Options: intel, internal
 
 source = ['dgbmv.pyf']
 
+# Set up the libraries for building against BLAS. Either use an internal copy
+# of dgbmv.f, or try and build against MKL.
 if blas_build == 'intel':
-    # Set library includes (taking into account which MPI library we are using)."
-    blas_lib = ['mkl_rt', 'iomp5', 'pthread', 'm']
+    blas_lib = ['mkl_rt', 'iomp5', 'pthread', 'm']  # MKL libraries we need to link against
     blas_libdir = [os.environ['MKLROOT']+'/lib/intel64' if 'MKLROOT' in os.environ else '']
 elif blas_build == 'internal':
     source += ['dgbmv.f']

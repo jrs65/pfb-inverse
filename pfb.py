@@ -212,7 +212,7 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
         blocks of samples.
     """
 
-    from drift.util import mpiutil
+    import mpiutil
 
     # If we are missing the Nyquist freq (default for CHIME), add it back in
     if no_nyquist:
