@@ -13,7 +13,7 @@ parser.add_argument('file_in', help='Input file to process.')
 parser.add_argument('file_out', help='File to write output timestream into.')
 parser.add_argument('-f', type=int, default=1024, help='Number of frequencies in file.', dest='nfreq')
 parser.add_argument('-n', type=int, default=4, help='Number of taps used for PFB', dest='ntap')
-parser.add_argument('-m', type=int, action='store_true', help='Input file is missing Nyquist frequency.', dest='no_nyquist')
+parser.add_argument('-m', action='store_true', help='Input file is missing Nyquist frequency.', dest='no_nyquist')
 
 args = parser.parse_args()
 
