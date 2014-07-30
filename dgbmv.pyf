@@ -1,0 +1,25 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module dgbmv ! in 
+    interface  ! in :dgbmv
+        subroutine dgbmv(trans,m,n,kl,ku,alpha,a,lda,x,incx,beta,y,incy) ! in :dgbmv:dgbmv.f
+            character :: trans
+            integer :: m
+            integer :: n
+            integer :: kl
+            integer :: ku
+            double precision :: alpha
+            double precision dimension(lda, n) :: a
+            integer :: lda
+            double precision dimension(*) :: x
+            integer :: incx
+            double precision :: beta
+            double precision dimension(*) :: y
+            integer :: incy
+        end subroutine dgbmv
+    end interface 
+end python module dgbmv
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
