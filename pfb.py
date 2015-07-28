@@ -162,12 +162,14 @@ def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
     ntsblock = nblock + ntap - 1
 
     # Coefficients for the P matrix
-    coeff_P = window(ntap, lblock).reshape(ntap, lblock)  # Create the window array
+    # Create the window array.
+    coeff_P = window(ntap, lblock).reshape(ntap, lblock)
 
     # Coefficients for the PP^T matrix
-    coeff_PPT = np.array([ (  coeff_P[:, np.newaxis, :]
-                            * coeff_P[np.newaxis, :, :] ).diagonal(offset=k).sum(axis=-1)
-                           for k in range(ntap) ])
+    coeff_PPT = np.array([(coeff_P[:, np.newaxis, :] *
+                           coeff_P[np.newaxis, :, :])
+                          .diagonal(offset=k).sum(axis=-1)
+                          for k in range(ntap)])
 
     rec_ts = np.zeros((lblock, ntsblock), dtype=np.float64)
 
@@ -193,7 +195,8 @@ def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
     return rec_ts
 
 
-def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=False, skip_initial_blocks=True):
+def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning,
+                         no_nyquist=False, skip_initial_blocks=True):
     """Invert the CHIME PFB timestream.
 
     Parameters
@@ -236,17 +239,19 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     local_off, start_off, end_off = mpiutil.split_local(lblock)
 
     # Coefficients for the P matrix
-    coeff_P = window(ntap, lblock).reshape(ntap, lblock)[:, start_off:end_off]  # Create the window array
+    # Create the window array
+    coeff_P = window(ntap, lblock).reshape(ntap, lblock)[:, start_off:end_off]
 
     # Coefficients for the PP^T matrix
-    coeff_PPT = np.array([ (  coeff_P[:, np.newaxis, :]
-                            * coeff_P[np.newaxis, :, :] ).diagonal(offset=k).sum(axis=-1)
-                           for k in range(ntap) ])
+    coeff_PPT = np.array([(coeff_P[:, np.newaxis, :] *
+                           coeff_P[np.newaxis, :, :])
+                          .diagonal(offset=k).sum(axis=-1)
+                          for k in range(ntap)])
 
     ax2size = nblock if skip_initial_blocks else ntsblock
     rec_ts = np.zeros((local_off, ax2size), dtype=np.float64)
 
-#    print mpiutil.rank, local_off, pseudo_ts.shape, coeff_P.shape
+    #  print mpiutil.rank, local_off, pseudo_ts.shape, coeff_P.shape
 
     for i_off in range(local_off):
 
