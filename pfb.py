@@ -106,7 +106,7 @@ def pfb(timestream, nfreq, ntap=4, window=sinc_hanning):
     lblock = 2 * (nfreq - 1)
 
     # Number of blocks
-    nblock = timestream.size / lblock - (ntap - 1)
+    nblock = timestream.size // lblock - (ntap - 1)
 
     # Initialise array for spectrum
     spec = np.zeros((nblock, nfreq), dtype=np.complex128)
@@ -207,7 +207,7 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     no_nyquist : boolean, optional
         If True, we are missing the Nyquist frequency (i.e. CHIME PFB), and we
         should add it back in (with zero amplitude).
-    skip_initial_blocks : boolean, optional    
+    skip_initial_blocks : boolean, optional
         If True (default), throw away the initial, heavily unconstrained
         blocks of samples.
     """
@@ -275,4 +275,3 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     rec_ts = rec_ts.T.copy()
 
     return rec_ts
-
