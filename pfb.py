@@ -106,7 +106,7 @@ def pfb(timestream, nfreq, ntap=4, window=sinc_hanning):
     lblock = 2 * (nfreq - 1)
 
     # Number of blocks
-    nblock = timestream.size / lblock - (ntap - 1)
+    nblock = timestream.size // lblock - (ntap - 1)
 
     # Initialise array for spectrum
     spec = np.zeros((nblock, nfreq), dtype=np.complex128)
@@ -162,12 +162,14 @@ def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
     ntsblock = nblock + ntap - 1
 
     # Coefficients for the P matrix
-    coeff_P = window(ntap, lblock).reshape(ntap, lblock)  # Create the window array
+    # Create the window array.
+    coeff_P = window(ntap, lblock).reshape(ntap, lblock)
 
     # Coefficients for the PP^T matrix
-    coeff_PPT = np.array([ (  coeff_P[:, np.newaxis, :]
-                            * coeff_P[np.newaxis, :, :] ).diagonal(offset=k).sum(axis=-1)
-                           for k in range(ntap) ])
+    coeff_PPT = np.array([(coeff_P[:, np.newaxis, :] *
+                           coeff_P[np.newaxis, :, :])
+                          .diagonal(offset=k).sum(axis=-1)
+                          for k in range(ntap)])
 
     rec_ts = np.zeros((lblock, ntsblock), dtype=np.float64)
 
@@ -193,7 +195,8 @@ def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
     return rec_ts
 
 
-def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=False, skip_initial_blocks=True):
+def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning,
+                         no_nyquist=False, skip_initial_blocks=True):
     """Invert the CHIME PFB timestream.
 
     Parameters
@@ -207,7 +210,7 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     no_nyquist : boolean, optional
         If True, we are missing the Nyquist frequency (i.e. CHIME PFB), and we
         should add it back in (with zero amplitude).
-    skip_initial_blocks : boolean, optional    
+    skip_initial_blocks : boolean, optional
         If True (default), throw away the initial, heavily unconstrained
         blocks of samples.
     """
@@ -236,17 +239,19 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     local_off, start_off, end_off = mpiutil.split_local(lblock)
 
     # Coefficients for the P matrix
-    coeff_P = window(ntap, lblock).reshape(ntap, lblock)[:, start_off:end_off]  # Create the window array
+    # Create the window array
+    coeff_P = window(ntap, lblock).reshape(ntap, lblock)[:, start_off:end_off]
 
     # Coefficients for the PP^T matrix
-    coeff_PPT = np.array([ (  coeff_P[:, np.newaxis, :]
-                            * coeff_P[np.newaxis, :, :] ).diagonal(offset=k).sum(axis=-1)
-                           for k in range(ntap) ])
+    coeff_PPT = np.array([(coeff_P[:, np.newaxis, :] *
+                           coeff_P[np.newaxis, :, :])
+                          .diagonal(offset=k).sum(axis=-1)
+                          for k in range(ntap)])
 
     ax2size = nblock if skip_initial_blocks else ntsblock
     rec_ts = np.zeros((local_off, ax2size), dtype=np.float64)
 
-#    print mpiutil.rank, local_off, pseudo_ts.shape, coeff_P.shape
+    #  print mpiutil.rank, local_off, pseudo_ts.shape, coeff_P.shape
 
     for i_off in range(local_off):
 
@@ -275,4 +280,3 @@ def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning, no_nyquist=F
     rec_ts = rec_ts.T.copy()
 
     return rec_ts
-
