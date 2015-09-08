@@ -83,7 +83,25 @@ def sinc_hanning(ntap, lblock):
     return sinc_window(ntap, lblock) * np.hanning(ntap * lblock)
 
 
-def pfb(timestream, nfreq, ntap=4, window=sinc_hanning):
+def sinc_hamming(ntap, lblock):
+    """Hamming-sinc window function.
+
+    Parameters
+    ----------
+    ntaps : integer
+        Number of taps.
+    lblock: integer
+        Length of block.
+
+    Returns
+    -------
+    window : np.ndarray[ntaps * lblock]
+    """
+
+    return sinc_window(ntap, lblock) * np.hamming(ntap * lblock)
+
+
+def pfb(timestream, nfreq, ntap=4, window=sinc_hamming):
     """Perform the CHIME PFB on a timestream.
 
     Parameters
@@ -128,7 +146,7 @@ def pfb(timestream, nfreq, ntap=4, window=sinc_hanning):
     return spec
 
 
-def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
+def inverse_pfb(ts_pfb, ntap, window=sinc_hamming, no_nyquist=False):
     """Invert the CHIME PFB timestream.
 
     Parameters
@@ -195,7 +213,7 @@ def inverse_pfb(ts_pfb, ntap, window=sinc_hanning, no_nyquist=False):
     return rec_ts
 
 
-def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hanning,
+def inverse_pfb_parallel(ts_pfb, ntap, nblock, window=sinc_hamming,
                          no_nyquist=False, skip_initial_blocks=True):
     """Invert the CHIME PFB timestream.
 
